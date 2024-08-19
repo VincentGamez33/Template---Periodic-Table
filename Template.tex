@@ -1,0 +1,854 @@
+\documentclass[landscape]{article}
+\usepackage[landscape, margin=5mm]{geometry}
+\usepackage{ifpdf}
+\usepackage[spanish]{babel}
+\pagestyle{empty}
+\usepackage[utf8x]{inputenc}
+\usepackage[x11names, usenames, svgnames, table]{xcolor}
+    \definecolor{rojo}{RGB}{230,28,42}
+    \definecolor{ama}{RGB}{255,215,0}
+    \definecolor{ciian}{RGB}{0,255,255}
+    \definecolor{om}{RGB}{153,255,0}
+\usepackage{tikz}
+\usetikzlibrary{shapes,calc}
+\usepackage[version=4,arrows=pgf-filled,
+textfontname=sffamily,
+mathfontname=mathsf]{mhchem}
+% \usepackage{periodic}
+
+
+\newcommand{\CommonElementTextFormat}[5]
+{
+      \begin{minipage}{2.2cm}
+          \centering
+          {\textbf{#1} \hfill #2}%
+          \linebreak \linebreak
+          {\textbf{#3}}%
+          \linebreak \linebreak
+          {\ifWithNames\large {#4}\fi}
+          \linebreak
+          {\scalebox{0.7}{#5}}
+      \end{minipage}
+}
+
+\newcommand{\NaturalElementTextFormat}[5]
+{
+    \CommonElementTextFormat{#1}{#2}{\LARGE {#3}}{#4}{#5}
+}
+
+\newcommand{\UncommonElementTextFormat}[5]
+{
+      \begin{minipage}{4.4cm}
+          \centering
+          {\scalebox{1.75}{\textbf{#1}} \hfill \scalebox{1.75}{#2}}%
+          \linebreak \linebreak
+          {\scalebox{3}{\textbf{#3}}}%
+          \linebreak \linebreak \linebreak
+          {\ifWithNames\scalebox{2}{{#4}} \fi}
+          \linebreak \linebreak
+          {\scalebox{1.25}{#5}}
+      \end{minipage}
+}
+
+\newcommand{\ExampleElementTextFormat}[5]
+{
+    \UncommonElementTextFormat{#1}{#2}{\LARGE {#3}}{#4}{#5}
+}
+
+\newcommand{\OutlineText}[1]
+{
+    \ifpdf
+    % Couldn't find a nicer way of doing an outline font with TikZ
+    % other than using pdfliteral 1 Tr
+    %
+    \pdfliteral direct {0.5 w 1 Tr}{#1}%
+    \pdfliteral direct {1 w 0 Tr}%
+    \else
+    % pstricks can do this with \pscharpath from pstricks
+    %
+    \pscharpath[shadow=false,
+    fillstyle=solid,
+    fillcolor=white,
+    linestyle=solid,
+    linecolor=black,
+    linewidth=.2pt]{#1}
+    \fi
+}
+
+\newcommand{\SyntheticElementTextFormat}[5]
+{
+    \ifpdf
+    \CommonElementTextFormat{#1}{#2}{\OutlineText{\LARGE #3}}{#4}{#5}
+    \else
+    % pstricks approach results in slightly larger box
+    % that doesn't break, so fudge here
+    \CommonElementTextFormat{#1}{#2}{\OutlineText{\Large #3}}{#4}{#5}
+    \fi
+}
+
+    %% Fill Color Styles
+    \tikzstyle{ElementFill} = [fill=yellow!15]
+    \tikzstyle{AlkaliMetalFill} = [fill=blue!55]
+    \tikzstyle{AlkalineEarthMetalFill} = [fill=blue!40]
+    \tikzstyle{MetalFill} = [fill=blue!25]
+    \tikzstyle{MetalloidFill} = [fill=orange!25]
+    \tikzstyle{NonmetalFill} = [fill=green!25]
+    \tikzstyle{HalogenFill} = [fill=green!40]
+    \tikzstyle{NobleGasFill} = [fill=ciian]
+    \tikzstyle{LanthanideActinideFill} = [fill=purple!25]
+    \tikzstyle{OthermetalsFill} = [fill=om!60]
+
+    %% Element Styles
+    \tikzstyle{Element} = [draw=black, ElementFill,
+    minimum width=2.75cm, minimum height=2.75cm, node distance=2.75cm, rounded corners]
+    \tikzstyle{AlkaliMetal} = [Element, AlkaliMetalFill]
+    \tikzstyle{AlkalineEarthMetal} = [Element, AlkalineEarthMetalFill]
+    \tikzstyle{Metal} = [Element, MetalFill]
+    \tikzstyle{Metalloid} = [Element, MetalloidFill]
+    \tikzstyle{Nonmetal} = [Element, NonmetalFill]
+    \tikzstyle{Halogen} = [Element, HalogenFill]
+    \tikzstyle{NobleGas} = [Element, NobleGasFill]
+    \tikzstyle{LanthanideActinide} = [Element, LanthanideActinideFill]
+    \tikzstyle{Othermetals} = [Element, OthermetalsFill]
+    \tikzstyle{PeriodLabel} = [font={\sffamily\LARGE}, node distance=2.0cm]
+    \tikzstyle{GroupLabel} = [font={\sffamily\LARGE}, minimum width=2.75cm, node distance=2.0cm]
+    \tikzstyle{TitleLabel} = [font={\sffamily\Huge\bfseries}]
+    
+    \tikzstyle{ElementExample} = [draw=black, NonmetalFill,
+    minimum width=4.75cm, minimum height=4.75cm, node distance=4.75cm, rounded corners]
+
+\usepackage{xparse}
+\newif\ifWithNames\WithNamestrue
+
+\NewDocumentCommand\TabPeriodic{ s O{0.55} }{
+  \begin{tikzpicture}[font=\sffamily, scale=#2, transform shape]
+    \IfBooleanTF{#1}{\WithNamesfalse}{\WithNamestrue}  
+    %---------------------------------------------------------------
+    %  Group 1 - IA
+    %---------------------------------------------------------------
+    \node[name=H, Nonmetal] {\NaturalElementTextFormat{1}{1.0079}{H}{Hidrógeno}{\ce{1s^1}}};
+    \node[name=Li, below of=H, AlkaliMetal] {\NaturalElementTextFormat{3}{6.941}{Li}{Litio}{\ce{1s^2 2s^1}}};
+    \node[name=Na, below of=Li, AlkaliMetal] {\NaturalElementTextFormat{11}{22.990}{Na}{Sodio}{\ce{[Ne] 3s^1}}};
+    \node[name=K, below of=Na, AlkaliMetal] {\NaturalElementTextFormat{19}{39.098}{K}{Potasio}{\ce{[Ar] 4s^1}}};
+    \node[name=Rb, below of=K, AlkaliMetal] {\NaturalElementTextFormat{37}{85.468}{Rb}{Rubidio}{\ce{[Kr] 5s^1}}};
+    \node[name=Cs, below of=Rb, AlkaliMetal] {\NaturalElementTextFormat{55}{132.91}{Cs}{Cesio}{\ce{[Xe] 6s^1}}};
+    \node[name=Fr, below of=Cs, AlkaliMetal] {\NaturalElementTextFormat{87}{(223)}{Fr}{Francio}{\ce{[Rn] 7s^1}}};
+    %---------------------------------------------------------------
+    %  Group 2 - IIA
+    %---------------------------------------------------------------
+    \node[name=Be, right of=Li, AlkalineEarthMetal] {\NaturalElementTextFormat{4}{9.0122}{Be}{Berilio}{\ce{1s^2 2s^2}}};
+    \node[name=Mg, below of=Be, AlkalineEarthMetal] {\NaturalElementTextFormat{12}{24.305}{Mg}{Magnesio}{\ce{[Ne] 3s^2}}};
+    \node[name=Ca, below of=Mg, AlkalineEarthMetal] {\NaturalElementTextFormat{20}{40.078}{Ca}{Calcio}{\ce{[Ar] 4s^2}}};
+    \node[name=Sr, below of=Ca, AlkalineEarthMetal] {\NaturalElementTextFormat{38}{87.62}{Sr}{Estroncio}{\ce{[Kr] 5s^2}}};
+    \node[name=Ba, below of=Sr, AlkalineEarthMetal] {\NaturalElementTextFormat{56}{137.33}{Ba}{Bario}{\ce{[Xe] 6s^2}}};
+    \node[name=Ra, below of=Ba, AlkalineEarthMetal] {\NaturalElementTextFormat{88}{(226)}{Ra}{Radio}{\ce{[Rn] 7s^2}}};
+    %---------------------------------------------------------------
+    %  Group 3 - IIIB
+    %---------------------------------------------------------------
+    \node[name=Sc, right of=Ca, Metal] {\NaturalElementTextFormat{21}{44.956}{Sc}{Escandio}{\ce{[Ar] 3d^1 4s^2}}};
+    \node[name=Y, below of=Sc, Metal] {\NaturalElementTextFormat{39}{88.906}{Y}{Itrio}{\ce{[Kr] 4d^1 5s^2}}};
+    \node[name=LaLu, below of=Y, LanthanideActinide] {\NaturalElementTextFormat{57-71}{}{La-Lu}{Lantánidos}{}};
+    \node[name=AcLr, below of=LaLu, LanthanideActinide] {\NaturalElementTextFormat{89-103}{}{Ac-\hspace{-6.5pt}\OutlineText{Lr}}{Actínidos}{}};
+    %---------------------------------------------------------------
+    %  Group 4 - IVB
+    %---------------------------------------------------------------
+    \node[name=Ti, right of=Sc, Metal] {\NaturalElementTextFormat{22}{47.867}{Ti}{Titanio}{\ce{[Ar] 3d^2 4s^2}}};
+    \node[name=Zr, below of=Ti, Metal] {\NaturalElementTextFormat{40}{91.224}{Zr}{Zirconio}{\ce{[Kr] 4d^2 4s^2}}};
+    \node[name=Hf, below of=Zr, Metal] {\NaturalElementTextFormat{72}{178.49}{Hf}{Hafnio}{\ce{[Xe] 4f^14 5d^2 6s^7}}};
+    \node[name=Rf, below of=Hf, Metal] {\SyntheticElementTextFormat{104}{(261)}{Rf}{Rutherfordio}{\ce{[Rn] 5f^14 6d^2 7s^7}}}; % Revisar Masa en la guía pone 267
+    %---------------------------------------------------------------
+    %  Group 5 - VB
+    %---------------------------------------------------------------
+    \node[name=V, right of=Ti, Metal] {\NaturalElementTextFormat{23}{50.942}{V}{Vanadio}{\ce{[Ar] 3d^3 4s^2}}};
+    \node[name=Nb, below of=V, Metal] {\NaturalElementTextFormat{41}{92.906}{Nb}{Niobio}{\ce{[Kr] 4d^4 5s^1}}};
+    \node[name=Ta, below of=Nb, Metal] {\NaturalElementTextFormat{73}{180.95}{Ta}{Tantalio}{\ce{[Xe] 4f^14 5d^3 6s^2}}};
+    \node[name=Db, below of=Ta, Metal] {\SyntheticElementTextFormat{105}{(262)}{Db}{Dubnio}{\ce{[Rn] 5f^14 6d^3 7s^2}}}; % Revisar Masa en la guía pone 268
+    %---------------------------------------------------------------
+    %  Group 6 - VIB
+    %---------------------------------------------------------------
+    \node[name=Cr, right of=V, Metal] {\NaturalElementTextFormat{24}{51.996}{Cr}{Cromo}{\ce{[Ar] 3d^5 4s^1}}};
+    \node[name=Mo, below of=Cr, Metal] {\NaturalElementTextFormat{42}{95.94}{Mo}{Molibdeno}{\ce{[Kr] 4d^5 5s^1}}};
+    \node[name=W, below of=Mo, Metal] {\NaturalElementTextFormat{74}{183.84}{W}{Wolfranio}{\ce{[Xe] 4f^14 5d^4 6s^2}}};
+    \node[name=Sg, below of=W, Metal] {\SyntheticElementTextFormat{106}{(266)}{Sg}{Seaborgio}{\ce{[Rn] 5f^14 6d^4 7s^2}}}; % Revisar Masa en la guía pone 271
+    %---------------------------------------------------------------
+    %  Group 7 - VIIB
+    %---------------------------------------------------------------
+    \node[name=Mn, right of=Cr, Metal] {\NaturalElementTextFormat{25}{54.938}{Mn}{Manganeso}{\ce{[Ar] 3d^5 4s^2}}};
+    \node[name=Tc, below of=Mn, Metal] {\NaturalElementTextFormat{43}{96}{Tc}{Tecnecio}{\ce{[Kr] 4d^5 5s^2}}};
+    \node[name=Re, below of=Tc, Metal] {\NaturalElementTextFormat{75}{186.21}{Re}{Renio}{\ce{[Xe] 4f^14 5d^5 6s^2}}};
+    \node[name=Bh, below of=Re, Metal] {\SyntheticElementTextFormat{107}{(264)}{Bh}{Bohrio}{\ce{[Rn] 5f^14 6d^5 7s^2}}}; % Revisar Masa en la guía pone 272
+    %---------------------------------------------------------------
+    %  Group 8 - VIIIB
+    %---------------------------------------------------------------
+    \node[name=Fe, right of=Mn, Metal] {\NaturalElementTextFormat{26}{55.845}{Fe}{Hierro}{\ce{[Ar] 3d^6 4s^2}}};
+    \node[name=Ru, below of=Fe, Metal] {\NaturalElementTextFormat{44}{101.07}{Ru}{Rutenio}{\ce{[Kr] 4d^7 5s^1}}};
+    \node[name=Os, below of=Ru, Metal] {\NaturalElementTextFormat{76}{190.23}{Os}{Osmio}{\ce{[Xe] 4f^14 5d^6 6s^2}}};
+    \node[name=Hs, below of=Os, Metal] {\SyntheticElementTextFormat{108}{(277)}{Hs}{Hasio}{\ce{[Rn] 5f^14 6d^10 7s^2}}};
+    %---------------------------------------------------------------
+    %  Group 9 - VIIIB
+    %---------------------------------------------------------------
+    \node[name=Co, right of=Fe, Metal] {\NaturalElementTextFormat{27}{58.933}{Co}{Cobalto}{\ce{[Ar] 3d^7 4s^2}}};
+    \node[name=Rh, below of=Co, Metal] {\NaturalElementTextFormat{45}{102.91}{Rh}{Rodio}{\ce{[Kr] 4d^8 5s^1}}};
+    \node[name=Ir, below of=Rh, Metal] {\NaturalElementTextFormat{77}{192.22}{Ir}{Iridio}{\ce{[Xe] 4f^14 5d^7 6s^2}}};
+    \node[name=Mt, below of=Ir, Metal] {\SyntheticElementTextFormat{109}{(268)}{Mt}{Meitnerio}{\ce{[Rn] 5f^14 5d^7 7s^2}}}; % Revisar Masa en la guía pone 276
+    %---------------------------------------------------------------
+    %  Group 10 - VIIIB
+    %---------------------------------------------------------------
+    \node[name=Ni, right of=Co, Metal] {\NaturalElementTextFormat{28}{58.693}{Ni}{Níquel}{\ce{[Ar] 3d^8 4s^2}}};
+    \node[name=Pd, below of=Ni, Metal] {\NaturalElementTextFormat{46}{106.42}{Pd}{Paladio}{\ce{[Kr] 4d^10}}};
+    \node[name=Pt, below of=Pd, Metal] {\NaturalElementTextFormat{78}{195.08}{Pt}{Platino}{\ce{[Xe] 4f^14 5d^9 6s^1}}};
+    \node[name=Ds, below of=Pt, Metal] {\SyntheticElementTextFormat{110}{(281)}{Ds}{Darmstatio}{\ce{[Rn] 5f^14 6d^8 7s^2}}};
+    %---------------------------------------------------------------
+    %  Group 11 - IB
+    %---------------------------------------------------------------
+    \node[name=Cu, right of=Ni, Metal] {\NaturalElementTextFormat{29}{63.546}{Cu}{Cobre}{\ce{[Ar] 3d^10 5s^1}}};
+    \node[name=Ag, below of=Cu, Metal] {\NaturalElementTextFormat{47}{107.87}{Ag}{Plata}{\ce{[Kr] 4d^10 5s^1}}};
+    \node[name=Au, below of=Ag, Metal] {\NaturalElementTextFormat{79}{196.97}{Au}{Oro}{\ce{[Xe] 4f^14 5d^10 6s^1}}};
+    \node[name=Rg, below of=Au, Metal] {\SyntheticElementTextFormat{111}{(280)}{Rg}{Roentgenio}{\ce{[Rn] 5f^14 6d^10 7s^1}}};
+    %---------------------------------------------------------------
+    %  Group 12 - IIB
+    %---------------------------------------------------------------
+    \node[name=Zn, right of=Cu, Metal] {\NaturalElementTextFormat{30}{65.39}{Zn}{Zinc}{\ce{[Ar] 3d^10 4s^2}}};
+    \node[name=Cd, below of=Zn, Metal] {\NaturalElementTextFormat{48}{112.41}{Cd}{Cadmio}{\ce{[Kr] 4d^10 5s^2}}};
+    \node[name=Hg, below of=Cd, Metal] {\NaturalElementTextFormat{80}{200.59}{Hg}{Mercurio}{\ce{[Xe] 4f^14 5d^10 6s^2}}};
+    \node[name=Cn, below of=Hg, Metal] {\SyntheticElementTextFormat{112}{(285)}{Cn}{Copernicio}{\ce{[Rn] 5f^14 6d^10 7s^2}}};
+    %---------------------------------------------------------------
+    %  Group 13 - IIIA
+    %---------------------------------------------------------------
+    \node[name=Ga, right of=Zn, Othermetals] {\NaturalElementTextFormat{31}{69.723}{Ga}{Galio}{\ce{[Ar] 3d^10 4s^2 4p^1}}};
+    \node[name=Al, above of=Ga, Othermetals] {\NaturalElementTextFormat{13}{26.982}{Al}{Aluminio}{\ce{[Ne] 3s^2 3p^1}}};
+    \node[name=B, above of=Al, Metalloid] {\NaturalElementTextFormat{5}{10.811}{B}{Boro}{\ce{1s^2 2^2 2p^1}}};
+    \node[name=In, below of=Ga, Othermetals] {\NaturalElementTextFormat{49}{114.82}{In}{Indio}{\ce{[Kr] 4d^10 5s^2 5p^1}}};
+    \node[name=Tl, below of=In, Othermetals] {\NaturalElementTextFormat{81}{204.38}{Tl}{Talio}{\ce{[Xe] 4f^14 5d^10 6s^2 6p^1}}};
+    \node[name=Nh, below of=Tl, Othermetals] {\SyntheticElementTextFormat{113}{(284)}{Nh}{Nihonio}{\ce{[Rn] 5f^14 6d^10 7s^2 7p^1}}}; % Revisar Masa en la guía pone 285
+    %---------------------------------------------------------------
+    %  Group 14 - IVA
+    %---------------------------------------------------------------
+    \node[name=C, right of=B, Nonmetal] {\NaturalElementTextFormat{6}{12.011}{C}{Carbono}{\ce{1s^2 2s^2 2p^2}}};
+    \node[name=Si, below of=C, Metalloid] {\NaturalElementTextFormat{14}{28.086}{Si}{Silicio}{\ce{[Ne] 3s^2 3p^2}}};
+    \node[name=Ge, below of=Si, Metalloid] {\NaturalElementTextFormat{32}{72.64}{Ge}{Germanio}{\ce{[Ar] 3d^10 4s^2 4p^2}}};
+    \node[name=Sn, below of=Ge, Othermetals] {\NaturalElementTextFormat{50}{118.71}{Sn}{Estaño}{\ce{[Kr] 4d^10 5s^2 5p^2}}};
+    \node[name=Pb, below of=Sn, Othermetals] {\NaturalElementTextFormat{82}{207.2}{Pb}{Plomo}{\ce{[Xe] 4f^14 5d^10 6s^2 6p^2}}};
+    \node[name=Fl, below of=Pb, Othermetals] {\SyntheticElementTextFormat{114}{(289)}{Fl}{Flerovio}{\ce{[Rn] 5f^14 6d^10 7s^2 7p^2}}}; % Revisar Masa en la guía pone 287
+    %---------------------------------------------------------------
+    %  Group 15 - VA
+    %---------------------------------------------------------------
+    \node[name=N, right of=C, Nonmetal] {\NaturalElementTextFormat{7}{14.007}{N}{Nitrógeno}{\ce{1s^2 2s^2 2p^3}}};
+    \node[name=P, below of=N, Nonmetal] {\NaturalElementTextFormat{15}{30.974}{P}{Fósforo}{\ce{[Ne] 3s^2 3p^3}}};
+    \node[name=As, below of=P, Metalloid] {\NaturalElementTextFormat{33}{74.922}{As}{Arsenico}{\ce{[Ar] 3d^10 4s^2 4p^3}}};
+    \node[name=Sb, below of=As, Metalloid] {\NaturalElementTextFormat{51}{121.76}{Sb}{Antimonio}{\ce{[Kr] 4d^10 5s^2 5p^3}}};
+    \node[name=Bi, below of=Sb, Othermetals] {\NaturalElementTextFormat{83}{208.98}{Bi}{Bismuto}{\ce{[Xe] 4f^14 5d^10 6s^2 6p^3}}};
+    \node[name=Mc, below of=Bi, Othermetals] {\SyntheticElementTextFormat{115}{(288)}{Mc}{Moscovio}{\ce{[Rn] 5f^14 6d^10 7s^2 7p^3}}}; % Revisar Masa en la guía pone 289
+    %---------------------------------------------------------------
+    %  Group 16 - VIA
+    %---------------------------------------------------------------
+    \node[name=O, right of=N, Nonmetal] {\NaturalElementTextFormat{8}{15.999}{O}{Oxígeno}{\ce{1s^2 2s^2 2p^4}}};
+    \node[name=S, below of=O, Nonmetal] {\NaturalElementTextFormat{16}{32.065}{S}{Azufre}{\ce{[Ne] 3s^2 3p^4}}};
+    \node[name=Se, below of=S, Nonmetal] {\NaturalElementTextFormat{34}{78.96}{Se}{Selenio}{\ce{[Ar] 3d^10 4s^2 4p^4}}};
+    \node[name=Te, below of=Se, Metalloid] {\NaturalElementTextFormat{52}{127.6}{Te}{Telurio}{\ce{[Kr] 4d^10 5s^2 5p^4}}};
+    \node[name=Po, below of=Te, Metalloid] {\NaturalElementTextFormat{84}{(209)}{Po}{Polonio}{\ce{[Xe] 4f^14 5d^10 6s^2 6p^4}}};
+    \node[name=Lv, below of=Po, Othermetals] {\SyntheticElementTextFormat{116}{(293)}{Lv}{Livermorio}{\ce{[Rn] 5f^14 6d^10 7s^2 7p^4}}}; % Revisar Masa en la guía pone 291
+    %---------------------------------------------------------------
+    %  Group 17 - VIIA
+    %---------------------------------------------------------------
+    \node[name=F, right of=O, Halogen] {\NaturalElementTextFormat{9}{18.998}{F}{Flúor}{\ce{1s^2 2s^2 2p^5}}};
+    \node[name=Cl, below of=F, Halogen] {\NaturalElementTextFormat{17}{35.453}{Cl}{Cloro}{\ce{[Ne] 3s^2 3p^5}}};
+    \node[name=Br, below of=Cl, Halogen] {\NaturalElementTextFormat{35}{79.904}{Br}{Bromo}{\ce{[Ar] 3d^10 4s^2 4p^5}}};
+    \node[name=I, below of=Br, Halogen] {\NaturalElementTextFormat{53}{126.9}{I}{Yodo}{\ce{[Kr] 4d^10 5s^2 5p^5}}};
+    \node[name=At, below of=I, Halogen] {\NaturalElementTextFormat{85}{(210)}{At}{Astato}{\ce{[Xe] 4f^14 5d^10 6s^2 6p^5}}};
+    \node[name=Ts, below of=At, Halogen] {\SyntheticElementTextFormat{117}{(292)}{Ts}{Teneso}{\ce{[Rn] 5f^14 6d^10 7s^2 7p^5}}}; % Revisar Masa en la guía pone 294
+    %---------------------------------------------------------------
+    %  Group 18 - VIIIA
+    %---------------------------------------------------------------
+    \node[name=Ne, right of=F, NobleGas] {\NaturalElementTextFormat{10}{20.180}{Ne}{Néon}{\ce{1s^2 2s^2 2p^6}}};
+    \node[name=He, above of=Ne, NobleGas] {\NaturalElementTextFormat{2}{4.0025}{He}{Helio}{\ce{1s^2}}};
+    \node[name=Ar, below of=Ne, NobleGas] {\NaturalElementTextFormat{18}{39.948}{Ar}{Argón}{\ce{[Ne] 3s^2 3p^6}}};
+    \node[name=Kr, below of=Ar, NobleGas] {\NaturalElementTextFormat{36}{83.8}{Kr}{Kriptón}{\ce{[Ar] 3d^10 4s^2 4p^6}}};
+    \node[name=Xe, below of=Kr, NobleGas] {\NaturalElementTextFormat{54}{131.29}{Xe}{Xenón}{\ce{[Kr] 4d^10 5s^2 5p^6}}};
+    \node[name=Rn, below of=Xe, NobleGas] {\NaturalElementTextFormat{86}{(222)}{Rn}{Radon}{\ce{[Xe] 4f^14 5d^10 6s^2 6p^6}}};
+    \node[name=Og, below of=Rn, NobleGas] {\SyntheticElementTextFormat{118}{(294)}{Og}{Oganesón}{\ce{[Rn] 5f^14 6d^10 7s^2 7p^6}}};
+    %---------------------------------------------------------------
+    %  Period
+    %---------------------------------------------------------------
+    \draw[rojo, fill=ama, rounded corners] ($(H.north -| H.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period1, left of=H, PeriodLabel] {\textbf{1}};
+    \draw[rojo, fill=ama, rounded corners] ($(Li.north -| Li.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period2, left of=Li, PeriodLabel] {\textbf{2}};
+    \draw[rojo, fill=ama, rounded corners] ($(Na.north -| Na.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period3, left of=Na, PeriodLabel] {\textbf{3}};
+    \draw[rojo, fill=ama, rounded corners] ($(K.north -| K.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period4, left of=K, PeriodLabel] {\textbf{4}};
+    \draw[rojo, fill=ama, rounded corners] ($(Rb.north -| Rb.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period5, left of=Rb, PeriodLabel] {\textbf{5}};
+    \draw[rojo, fill=ama, rounded corners] ($(Cs.north -| Cs.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period6, left of=Cs, PeriodLabel] {\textbf{6}};
+    \draw[rojo, fill=ama, rounded corners] ($(Fr.north -| Fr.south) + (-6.5em,-7.625em)$) rectangle +(1.65em, 7.5em);
+    \node[name=Period7, left of=Fr, PeriodLabel] {\textbf{7}};
+    %---------------------------------------------------------------
+    %  Group
+    %---------------------------------------------------------------
+    \draw[rojo, fill=ama, rounded corners] ($(H.north west -| H.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group1, above of=H, GroupLabel] {\textbf{I-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Be.north west -| Be.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group2, above of=Be, GroupLabel] {\textbf{II-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Sc.north west -| Sc.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group3, above of=Sc, GroupLabel] {\textbf{III-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Ti.north west -| Ti.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group4, above of=Ti, GroupLabel] {\textbf{IV-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(V.north west -| V.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group5, above of=V, GroupLabel] {\textbf{V-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Cr.north west -| Cr.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group6, above of=Cr, GroupLabel] {\textbf{VI-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Mn.north west -| Mn.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group7, above of=Mn, GroupLabel] {\textbf{VII-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Co.north west -| Co.south east) + (-15.3em, 0.75em)$) rectangle +(22.75em, 2em);
+    \node[name=Group9, above of=Co, GroupLabel] {\textbf{VIII-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Cu.north west -| Cu.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group11, above of=Cu, GroupLabel] {\textbf{I-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(Zn.north west -| Zn.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group12, above of=Zn, GroupLabel] {\textbf{II-B}};%
+    \draw[rojo, fill=ama, rounded corners] ($(B.north west -| B.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group13, above of=B, GroupLabel] {\textbf{III-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(C.north west -| C.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group14, above of=C, GroupLabel] {\textbf{IV-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(N.north west -| N.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group15, above of=N, GroupLabel] {\textbf{V-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(O.north west -| O.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group16, above of=O, GroupLabel] {\textbf{VI-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(F.north west -| F.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group17, above of=F, GroupLabel] {\textbf{VII-A}};%
+    \draw[rojo, fill=ama, rounded corners] ($(He.north west -| He.south east) + (-7.5em, 0.75em)$) rectangle +(7.25em, 2em);
+    \node[name=Group18, above of=He, GroupLabel] {\textbf{VIII-A}};%
+    %---------------------------------------------------------------
+    %  Lanthanide
+    %---------------------------------------------------------------
+    \node[name=La, below of=Rf, LanthanideActinide, yshift=-3cm] {\NaturalElementTextFormat{57}{138.91}{La}{Lantano}{[Xe] 5d$^1$5s$^2$}};
+    \node[name=Ce, right of=La, LanthanideActinide] {\NaturalElementTextFormat{58}{140.12}{Ce}{Cerio}{[Xe] 5f$^1$5d$^1$6s$^2$}};
+    \node[name=Pr, right of=Ce, LanthanideActinide] {\NaturalElementTextFormat{59}{140.91}{Pr}{Praseodimio}{[Xe] 5f$^3$6s$^2$}};
+    \node[name=Nd, right of=Pr, LanthanideActinide] {\NaturalElementTextFormat{60}{144.24}{Nd}{Neodimio}{[Xe] 5f$^4$6s$^2$}};
+    \node[name=Pm, right of=Nd, LanthanideActinide] {\SyntheticElementTextFormat{61}{145}{Pm}{Prometio}{[Xe] 5f$^5$6s$^2$}};
+    \node[name=Sm, right of=Pm, LanthanideActinide] {\NaturalElementTextFormat{62}{150.36}{Sm}{Samario}{[Xe] 5f$^6$6s$^2$}};
+    \node[name=Eu, right of=Sm, LanthanideActinide] {\NaturalElementTextFormat{63}{151.96}{Eu}{Europio}{[Xe] 5f$^7$6s$^2$}};
+    \node[name=Gd, right of=Eu, LanthanideActinide] {\NaturalElementTextFormat{64}{157.25}{Gd}{Gadolinio}{[Xe] 4f$^7$5d$^1$6s$^2$}};
+    \node[name=Tb, right of=Gd, LanthanideActinide] {\NaturalElementTextFormat{65}{158.93}{Tb}{Terbio}{[Xe] 4f$^9$6s$^2$}};
+    \node[name=Dy, right of=Tb, LanthanideActinide] {\NaturalElementTextFormat{66}{162.50}{Dy}{Disprosio}{[Xe] 4f$^{10}$6s$^2$}};
+    \node[name=Ho, right of=Dy, LanthanideActinide] {\NaturalElementTextFormat{67}{164.93}{Ho}{Holmio}{[Xe] 4f$^{11}$6s$^2$}};
+    \node[name=Er, right of=Ho, LanthanideActinide] {\NaturalElementTextFormat{68}{167.26}{Er}{Ermio}{[Xe] 4f$^{12}$6s$^2$}};
+    \node[name=Tm, right of=Er, LanthanideActinide] {\NaturalElementTextFormat{69}{168.93}{Tm}{Tulio}{[Xe] 4f$^{13}$6s$^2$}};
+    \node[name=Yb, right of=Tm, LanthanideActinide] {\NaturalElementTextFormat{70}{173.04}{Yb}{Iterbio}{[Xe] 4f$^{14}$6s$^2$}};
+    \node[name=Lu, right of=Yb, LanthanideActinide] {\NaturalElementTextFormat{71}{174.97}{Lu}{Lutecio}{[Xe] 5f$^{14}$5d$^1$5s$^2$}};
+    %---------------------------------------------------------------
+    %  Actinide
+    %---------------------------------------------------------------
+    \node[name=Ac, below of=La, LanthanideActinide, yshift=-1cm] {\NaturalElementTextFormat{89}{(227)}{Ac}{Actinio}{[Rn] 6d$^1$7s$^2$}};
+    \node[name=Th, right of=Ac, LanthanideActinide] {\NaturalElementTextFormat{90}{232.04}{Th}{Torio}{[Rn] 6d$^2$7s$^2$}};
+    \node[name=Pa, right of=Th, LanthanideActinide] {\NaturalElementTextFormat{91}{231.04}{Pa}{Protactinio}{[Rn] 5f$^2$6d$^1$7s$^2$}};
+    \node[name=U, right of=Pa, LanthanideActinide] {\NaturalElementTextFormat{92}{238.03}{U}{Uranio}{[Rn] 5f$^3$6d$^1$7s$^2$}};
+    \node[name=Np, right of=U, LanthanideActinide] {\SyntheticElementTextFormat{93}{(237)}{Np}{Neptunio}{[Rn] 5f$^4$6d$^1$7s$^2$}};
+    \node[name=Pu, right of=Np, LanthanideActinide] {\SyntheticElementTextFormat{94}{(244)}{Pu}{Plutonio}{[Rn] 5f$^6$6s$^2$}};
+    \node[name=Am, right of=Pu, LanthanideActinide] {\SyntheticElementTextFormat{95}{(243)}{Am}{Americio}{[Rn] 5f$^7$7s$^2$}};
+    \node[name=Cm, right of=Am, LanthanideActinide] {\SyntheticElementTextFormat{96}{(247)}{Cm}{Curio}{[Rn] 5f$^7$6d$^1$7s$^2$}};
+    \node[name=Bk, right of=Cm, LanthanideActinide] {\SyntheticElementTextFormat{97}{(247)}{Bk}{Berkelio}{[Rn] 5f$^9$7s$^2$}};
+    \node[name=Cf, right of=Bk, LanthanideActinide] {\SyntheticElementTextFormat{98}{(251)}{Cf}{Californio}{[Rn] 5f$^{10}$7s$^2$}};
+    \node[name=Es, right of=Cf, LanthanideActinide] {\SyntheticElementTextFormat{99}{(252)}{Es}{Einsteinio}{[Rn] 5f$^{11}$6s$^2$}};
+    \node[name=Fm, right of=Es, LanthanideActinide] {\SyntheticElementTextFormat{100}{(257)}{Fm}{Fermio}{[Rn] 5f$^{12}$7s$^2$}};
+    \node[name=Md, right of=Fm, LanthanideActinide] {\SyntheticElementTextFormat{101}{(258)}{Md}{Mendelevio}{[Rn] 5f$^{13}$7s$^2$}};
+    \node[name=No, right of=Md, LanthanideActinide] {\SyntheticElementTextFormat{102}{(259)}{No}{Nobelio}{[Rn] 5f$^{14}$7s$^2$}};
+    \node[name=Lr, right of=No, LanthanideActinide] {\SyntheticElementTextFormat{103}{(262)}{Lr}{Laurencio}{[Rn] 5f$^{14}$6s$^2$7p$^1$}};
+    %% Draw dotted lines connecting Lanthanide breakout to main table
+  %  \draw (LaLu.north west) edge[dotted] (La.north west)
+  % (LaLu.north east) edge[dotted] (Lu.north east)
+  %  (LaLu.south west) edge[dotted] (La.south west);
+  % (LaLu.south east) edge[dotted] (Lu.south east);
+    %% Draw dotted lines connecting Actinide breakout
+    %% Draw lines Al -- Lv
+    \draw[red, ultra thick, rounded corners] (B.south west) -- (B.south east) -- (Si.south west) -- (Si.south east) -- (As.south west) -- (As.south east) -- (Te.south west) -- (Te.south east) -- (At.south west);
+    %---------------------------------------------------------------
+    %  Legend
+    %---------------------------------------------------------------
+    \draw[black, AlkaliMetalFill] ($(Cu.north -| Zn.west) + (-5cm,9cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{Alcalinos}};%
+    \draw[black, AlkalineEarthMetalFill] ($(Cu.north -| Zn.west) + (-5cm,8.3cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{Alcalinotérreos}};%
+    \draw[black, MetalFill] ($(Cu.north -| Zn.west) + (-5cm,7.6cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{Metal}};%
+    \draw[black, MetalloidFill] ($(Cu.north -| Zn.west) + (-5cm,6.9cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{Metaloides}};%
+    \draw[black, NonmetalFill] ($(Cu.north -| Zn.west) + (-5cm,6.2cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{No metales}};%
+    \draw[black, OthermetalsFill] ($(Cu.north -| Zn.west) + (-5cm,5.5cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{Otros metales}};%
+    \draw[black, HalogenFill] ($(Cu.north -| Zn.west) + (-5cm,4.8cm)$) rectangle +(1em, 1em) node[right, yshift=-6pt]{\scalebox{1.75}{Halógenos}};%
+    \draw[black, NobleGasFill] ($(Cu.north -| Zn.west) + (-5cm,4.1cm)$) rectangle +(1em, 1em) node[right, yshift=-1ex]{\scalebox{1.75}{Gas noble}};%
+    \draw[black, LanthanideActinideFill] ($(Cu.north -| Zn.west) + (-5cm,3.4cm)$) rectangle +(1em, 1em) node[right, yshift=-6pt]{\scalebox{1.75}{Lantánidos/Actínidos}};%
+    %\node at ($(La.north -| Fr.west) + (5em,-15em)$) [name=elementLegend, Element, fill=white]
+    %{\NaturalElementTextFormat{Z}{masa}{Símbolo}{Nombre}};
+    %\node[Element, fill=white, right of=elementLegend, xshift=1em]
+    %{\SyntheticElementTextFormat{}{}{\scalebox{0.9}{Artificial}}{}} ;
+    %---------------------------------------------------------------
+    %  Valencia numbers
+    %---------------------------------------------------------------
+        %  Group 1 - IA
+    \node at (H.north -| H.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$1}}};
+    \node at (H.north -| H.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};%
+    \node at (Li.north -| Li.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+1}}};%
+    \node at (Na.north -| Na.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{$-$1}};
+    \node at (Na.north -| Na.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};%
+    \node at (K.north -| K.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{$-$1}};
+    \node at (K.north -| K.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};%
+    \node at (Rb.north -| Rb.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{$-$1}};
+    \node at (Rb.north -| Rb.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};%
+    \node at (Cs.north -| Cs.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{$-$1}};
+    \node at (Cs.north -| Cs.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};%
+    \node at (Fr.north -| Fr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+1}}};%
+        %  Group 2 - IIA
+    \node at (Be.north -| Be.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Be.north -| Be.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Mg.north -| Mg.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Mg.north -| Mg.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Ca.north -| Ca.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ca.north -| Ca.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Sr.north -| Sr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Sr.north -| Sr.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Ba.north -| Ba.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ba.north -| Ba.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Ra.north -| Ra.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+2}}};%
+        %  Group 3 - IIIB
+    \node at (Sc.north -| Sc.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Sc.north -| Sc.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Sc.north -| Sc.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Y.north -| Y.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Y.north -| Y.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Y.north -| Y.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+        %  Group 4 - IVB
+    \node at (Ti.north -| Ti.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ti.north -| Ti.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Ti.north -| Ti.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Ti.north -| Ti.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Zr.north -| Zr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Zr.north -| Zr.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Zr.north -| Zr.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Zr.north -| Zr.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Hf.north -| Hf.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Hf.north -| Hf.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Hf.north -| Hf.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Hf.north -| Hf.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Rf.north -| Rf.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+4}}};%
+        %  Group 5 - VB
+    \node at (V.north -| V.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (V.north -| V.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (V.north -| V.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (V.north -| V.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (V.north -| V.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (Nb.north -| Nb.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Nb.north -| Nb.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Nb.north -| Nb.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Nb.north -| Nb.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Nb.north -| Nb.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (Ta.north -| Ta.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ta.north -| Ta.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Ta.north -| Ta.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Ta.north -| Ta.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Ta.north -| Ta.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (Db.north -| Db.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+5}}};
+        %  Group 6 - VIB
+    \node at (Cr.north -| Cr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Cr.north -| Cr.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Cr.north -| Cr.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Cr.north -| Cr.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Cr.north -| Cr.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Cr.north -| Cr.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (Mo.north -| Mo.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Mo.north -| Mo.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Mo.north -| Mo.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Mo.north -| Mo.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Mo.north -| Mo.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Mo.north -| Mo.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (W.north -| W.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (W.north -| W.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (W.north -| W.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (W.north -| W.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (W.north -| W.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (W.north -| W.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (Sg.north -| Sg.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+6}}};%
+        %  Group 7 - VIIB
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (Mn.north -| Mn.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+7}}};%
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (Tc.north -| Tc.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+7}}};%
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (Re.north -| Re.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+7}}};%
+    \node at (Bh.north -| Bh.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+7}}};%
+        %  Group 8 - VIIIB
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+6}}};
+    \node at (Fe.north -| Fe.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{+7}};%
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{+7}};
+    \node at (Ru.north -| Ru.east) [xshift=-7pt, yshift=-2.175cm] {\scalebox{0.6}{+8}};%
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{+7}};
+    \node at (Os.north -| Os.east) [xshift=-7pt, yshift=-2.175cm] {\scalebox{0.6}{+8}};%
+    \node at (Hs.north -| Hs.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+8}}};%
+        %  Group 9 - VIIIB
+    \node at (Co.north -| Co.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Co.north -| Co.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Co.north -| Co.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Co.north -| Co.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Co.north -| Co.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};%
+    \node at (Rh.north -| Rh.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Rh.north -| Rh.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Rh.north -| Rh.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Rh.north -| Rh.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Rh.north -| Rh.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Rh.north -| Rh.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};%
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{+7}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-2.175cm] {\scalebox{0.6}{+8}};
+    \node at (Ir.north -| Ir.east) [xshift=-7pt, yshift=-2.4cm] {\scalebox{0.6}{+9}};%
+    \node at (Mt.north -| Mt.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 10 - VIIIB
+    \node at (Ni.north -| Ni.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ni.north -| Ni.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Ni.north -| Ni.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Ni.north -| Ni.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};%
+    \node at (Pd.north -| Pd.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Pd.north -| Pd.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Pd.north -| Pd.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Pd.north -| Pd.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Pd.north -| Pd.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Pd.north -| Pd.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};%
+    \node at (Pt.north -| Pt.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Pt.north -| Pt.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Pt.north -| Pt.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Pt.north -| Pt.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Pt.north -| Pt.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (Pt.north -| Pt.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};%
+    \node at (Ds.north -| Ds.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 11 - IB
+    \node at (Cu.north -| Cu.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Cu.north -| Cu.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Cu.north -| Cu.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Cu.north -| Cu.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};%
+    \node at (Ag.north -| Ag.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (Ag.north -| Ag.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Ag.north -| Ag.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Ag.north -| Ag.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};%
+    \node at (Au.north -| Au.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Au.north -| Au.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Au.north -| Au.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Au.north -| Au.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};%
+    \node at (Rg.north -| Rg.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 12 - IIB
+    \node at (Zn.north -| Zn.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Zn.north -| Zn.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Cd.north -| Cd.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Cd.north -| Cd.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Hg.north -| Hg.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (Hg.north -| Hg.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};%
+    \node at (Cn.north -| Cn.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+2}}};%
+        %  Group 13 - IIIA
+    \node at (B.north -| B.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (B.north -| B.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (B.north -| B.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Al.north -| Al.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Al.north -| Al.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Al.north -| Al.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Ga.north -| Ga.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Ga.north -| Ga.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Ga.north -| Ga.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (In.north -| In.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (In.north -| In.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (In.north -| In.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Tl.north -| Tl.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (Tl.north -| Tl.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Tl.north -| Tl.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Nh.north -| Nh.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 14 - IVA
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$4}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{$-$3}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{$-$2}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{$-$1}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (C.north -| C.east) [xshift=-7pt, yshift=-2.175cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Si.north -| Si.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$4}}};
+    \node at (Si.north -| Si.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (Si.north -| Si.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+2}};
+    \node at (Si.north -| Si.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (Si.north -| Si.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Ge.north -| Ge.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$4}}};
+    \node at (Ge.north -| Ge.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (Ge.north -| Ge.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Ge.north -| Ge.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (Ge.north -| Ge.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Sn.north -| Sn.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$4}}};
+    \node at (Sn.north -| Sn.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (Sn.north -| Sn.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Sn.north -| Sn.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (Sn.north -| Sn.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Pb.north -| Pb.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Pb.north -| Pb.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Pb.north -| Pb.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Pb.north -| Pb.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Fl.north -| Fl.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 15 - VA
+    \node at (N.north -| N.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$3}}};
+    \node at (N.north -| N.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (N.north -| N.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+2}};
+    \node at (N.north -| N.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (N.north -| N.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+4}};
+    \node at (N.north -| N.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (P.north -| P.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$3}}};
+    \node at (P.north -| P.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (P.north -| P.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+2}};
+    \node at (P.north -| P.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (P.north -| P.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+4}};
+    \node at (P.north -| P.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (As.north -| As.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$3}}};
+    \node at (As.north -| As.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (As.north -| As.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+2}};
+    \node at (As.north -| As.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (As.north -| As.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+4}};
+    \node at (As.north -| As.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (Sb.north -| Sb.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$3}}};
+    \node at (Sb.north -| Sb.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (Sb.north -| Sb.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+2}};
+    \node at (Sb.north -| Sb.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Sb.north -| Sb.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+4}};
+    \node at (Sb.north -| Sb.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (Bi.north -| Bi.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Bi.north -| Bi.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Bi.north -| Bi.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Bi.north -| Bi.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Bi.north -| Bi.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};%
+    \node at (Mc.north -| Mc.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 16 - VIA
+    \node at (O.north -| O.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$2}}};
+    \node at (O.north -| O.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{$-$1}};
+    \node at (O.north -| O.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+1}};
+    \node at (O.north -| O.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+2}};%
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$2}}};
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+5}};
+    \node at (S.north -| S.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$2}}};
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+5}};
+    \node at (Se.north -| Se.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$2}}};
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+1}};
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+5}};
+    \node at (Te.north -| Te.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (Po.north -| Po.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$2}}};
+    \node at (Po.north -| Po.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Po.north -| Po.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Po.north -| Po.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+5}};
+    \node at (Po.north -| Po.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+6}};%
+    \node at (Lv.north -| Lv.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 17 - VIIA
+    \node at (F.north -| F.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$1}}};%
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$1}}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+2}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+3}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+4}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+5}}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{+6}};
+    \node at (Cl.north -| Cl.east) [xshift=-7pt, yshift=-2.175cm] {\scalebox{0.6}{\textbf{+7}}};%
+    \node at (Br.north -| Br.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$1}}};
+    \node at (Br.north -| Br.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (Br.north -| Br.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Br.north -| Br.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (Br.north -| Br.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+5}}};
+    \node at (Br.north -| Br.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+7}};%
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$1}}};
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{\textbf{+5}}};
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+6}};
+    \node at (I.north -| I.east) [xshift=-7pt, yshift=-1.95cm] {\scalebox{0.6}{\textbf{+7}}};%
+    \node at (At.north -| At.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{$\pm$1}};
+    \node at (At.north -| At.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{$-$1}}};
+    \node at (At.north -| At.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+1}}};
+    \node at (At.north -| At.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (At.north -| At.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+5}};
+    \node at (At.north -| At.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+7}};%
+    \node at (Ts.north -| Ts.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{¿?}};%
+        %  Group 18 - VIIIA
+    \node at (He.north -| He.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+    \node at (Ne.north -| Ne.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+    \node at (Ar.north -| Ar.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+    \node at (Kr.north -| Kr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+    \node at (Xe.north -| Xe.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+    \node at (Rn.north -| Rn.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+    \node at (Og.north -| Og.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{-\,-}};%
+        %  Lanthanide Series
+    \node at (La.north -| La.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (La.north -| La.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (La.north -| La.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Ce.north -| Ce.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Ce.north -| Ce.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Ce.north -| Ce.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Pr.north -| Pr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Pr.north -| Pr.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Pr.north -| Pr.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+4}};
+    \node at (Pr.north -| Pr.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+5}};%
+    \node at (Nd.north -| Nd.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Nd.north -| Nd.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Nd.north -| Nd.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+4}};%
+    \node at (Pm.north -| Pm.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Pm.north -| Pm.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Sm.north -| Sm.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Sm.north -| Sm.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Eu.north -| Eu.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (Eu.north -| Eu.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Gd.north -| Gd.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Gd.north -| Gd.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Gd.north -| Gd.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Tb.north -| Tb.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Tb.north -| Tb.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Tb.north -| Tb.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Tb.north -| Tb.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};%
+    \node at (Dy.north -| Dy.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Dy.north -| Dy.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Dy.north -| Dy.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Ho.north -| Ho.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Ho.north -| Ho.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Er.north -| Er.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Er.north -| Er.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Tm.north -| Tm.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Tm.north -| Tm.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Yb.north -| Yb.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Yb.north -| Yb.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Lu.north -| Lu.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Lu.north -| Lu.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+        %  Actinidae Series
+    \node at (Ac.north -| Ac.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (Bk.north -| Bk.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Bk.north -| Bk.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+4}};%
+    \node at (Th.north -| Th.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (Th.north -| Th.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (Th.north -| Th.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (Th.north -| Th.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{\textbf{+4}}};%
+    \node at (Pa.north -| Pa.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+3}};
+    \node at (Pa.north -| Pa.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+4}};
+    \node at (Pa.north -| Pa.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+5}}};%
+    \node at (U.north -| U.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+1}};
+    \node at (U.north -| U.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+2}};
+    \node at (U.north -| U.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+3}};
+    \node at (U.north -| U.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+4}};
+    \node at (U.north -| U.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+5}};
+    \node at (U.north -| U.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{\textbf{+6}}};%
+    \node at (Np.north -| Np.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Np.north -| Np.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+3}};
+    \node at (Np.north -| Np.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Np.north -| Np.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+5}};
+    \node at (Np.north -| Np.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+6}};
+    \node at (Np.north -| Np.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+7}};%
+    \node at (Pu.north -| Pu.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Pu.north -| Pu.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+3}};
+    \node at (Pu.north -| Pu.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{\textbf{+4}}};
+    \node at (Pu.north -| Pu.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+5}};
+    \node at (Pu.north -| Pu.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+6}};
+    \node at (Pu.north -| Pu.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+7}};%
+    \node at (Am.north -| Am.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Am.north -| Am.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Am.north -| Am.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+4}};
+    \node at (Am.north -| Am.east) [xshift=-7pt, yshift=-1.275cm] {\scalebox{0.6}{+5}};
+    \node at (Am.north -| Am.east) [xshift=-7pt, yshift=-1.5cm] {\scalebox{0.6}{+6}};
+    \node at (Am.north -| Am.east) [xshift=-7pt, yshift=-1.725cm] {\scalebox{0.6}{+7}};%
+    \node at (Cm.north -| Cm.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+3}}};
+    \node at (Cm.north -| Cm.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+4}};
+    \node at (Cm.north -| Cm.east) [xshift=-7pt, yshift=-1.05cm] {\scalebox{0.6}{+6}};%
+    \node at (Md.north -| Md.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{+2}};
+    \node at (Md.north -| Md.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{\textbf{+3}}};%
+    \node at (No.north -| No.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+2}}};
+    \node at (No.north -| No.east) [xshift=-7pt, yshift=-0.825cm] {\scalebox{0.6}{+3}};%
+    \node at (Lr.north -| Lr.east) [xshift=-7pt, yshift=-0.6cm] {\scalebox{0.6}{\textbf{+3}}};%
+    %---------------------------------------------------------------
+    %  Element Example
+    %---------------------------------------------------------------
+    \node at (H.west -| Fe.north) [name=EE, ElementExample, xshift=-5.25cm, yshift=-1.25cm] {\UncommonElementTextFormat{1}{1.0079}{H}{Hidrógeno}{\ce{1s^1}}};
+    \node at (EE.north -| EE.east) [xshift=-0.45cm, yshift=-1.3cm] {\scalebox{1}{\textbf{$-$1}}};
+    \node at (EE.north -| EE.east) [xshift=-0.45cm, yshift=-1.65cm] {\scalebox{1}{\textbf{+1}}};
+    \begin{scope}[xshift=-1.25cm, yshift=-0.75cm]
+        %---------------------------------------------------------------
+        %  Explicacion del Ejemplo
+        %---------------------------------------------------------------
+        \draw[name=Simbolo, thick, -latex] (11.5,1.225) -- (12.5,1.225);
+        \node at (9.75,1.25) {\scalebox{1.75}{N$^{\circ}$ atómico}};%
+        \draw[thick, -latex] (11.5,0.125) -- (12.5,0.125);
+        \node at (9.75,0.125) {\scalebox{1.75}{Símbolo$^*$}};%
+        \draw[thick, -latex] (11.5,-1.35) -- (12.5,-1.35);
+        \node at (9.75,-1.35) {\scalebox{1.75}{Nombre}};%
+        \draw[thick, -latex] (19,1.225) -- (18,1.225);
+        \node at (21.2,1.225) {\scalebox{1.75}{Masa atómica$^{**}$}};%
+        \draw[thick, -latex] (19,0.4) -- (18,0.4);
+        \node[above] at (20.9,0.1) {\scalebox{1.75}{Electrones de}};
+        \node[below] at (20.9,0.1) {\scalebox{1.75}{Valencia$^{***}$}};%
+        \draw[thick, -latex] (19,-2.225) -- (18,-2.225);
+        \node[above] at (21,-2.2) {\scalebox{1.75}{Configuración}};
+        \node[below] at (21,-2.2-) {\scalebox{1.75}{electrónica}};%
+        \draw[ultra thick] (7.8,1.875) -- (7.8,-2.875);
+        \node[rotate=90] at (7.3,-0.5) {\scalebox{1.75}{ \textbf{Periodo}}};%
+        \draw[ultra thick] (12.875,2.5) -- (17.625,2.5);
+        \node at (15.25,3) {\scalebox{1.75}{\textbf{Grupo}}};%
+    \end{scope}
+    %% Diagram Title
+    \node at (H.west -| Fe.north) [name=diagramTitle, TitleLabel, xshift=3cm, yshift=6cm]
+    {\scalebox{1.75}{Tabla Periódica de los Elementos}};
+    %% Notas
+    \node[name=*] at (Fr.south west) [xshift=0.4cm, yshift=-0.5cm] {\scalebox{1.5}{\textcolor{white}{**}*}};
+    \node at (*.east) [xshift=5.325cm] {\scalebox{1.5}{Los elementos con \hspace{-3pt}\textbf{\OutlineText{esta fuente}} son \hspace{-3pt}\textbf{\OutlineText{Artificiales}}.}};%
+    \node[name=**] at (Fr.south west) [xshift=0.4cm, yshift=-1.1cm] {\scalebox{1.5}{\textcolor{white}{*}**}};
+    \node at (**.east) [xshift=7.85cm, yshift=-0.05cm] {\scalebox{1.5}{Las masas de los elementos radioactivos se encuentran entre paréntesis.}};%%
+    \node[name=***] at (Fr.south west) [xshift=0.4cm, yshift=-1.7cm] {\scalebox{1.5}{***}};
+    \node at (***.east) [xshift=5.1cm, yshift=-0.05cm] {\scalebox{1.5}{Los números en \textbf{negritas} son los más estables.}};%%
+  \end{tikzpicture}
+}
+
+\begin{document}
+
+    \TabPeriodic[0.5] 
+
+\end{document}
